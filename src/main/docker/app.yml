@@ -1,0 +1,24 @@
+version: '2'
+services:
+    jhipstairway-app:
+        image: jhipstairway
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_DATA_CASSANDRA_CONTACTPOINTS=jhipstairway-cassandra
+            - JHIPSTER_SLEEP=30 # gives time for the Cassandra cluster to start and execute the migration scripts
+        ports:
+            - 8080:8080
+    jhipstairway-cassandra:
+        extends:
+            file: cassandra-cluster.yml
+            service: jhipstairway-cassandra
+    jhipstairway-cassandra-node:
+        image: cassandra:3.9
+        environment:
+            - CASSANDRA_SEEDS=jhipstairway-cassandra
+    jhipstairway-cassandra-migration:
+        extends:
+            file: cassandra-migration.yml
+            service: jhipstairway-cassandra-migration
+        environment:
+            - CREATE_KEYSPACE_SCRIPT=create-keyspace-prod.cql
